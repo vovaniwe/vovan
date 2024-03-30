@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced File Upload</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Загрузите файлы</h1>
+        <form id="upload-form" action="/upload" method="post" enctype="multipart/form-data">
+            <input type="file" name="file" id="file" hidden>
+            <button type="button" id="file-label" class="file-upload">Выбрать файл</button>
+            <input type="submit" value="Upload" id="submit-button" class="file-upload" style="display: none;">
+            <div id="filename"></div>
+            <div id="drop-area">
+                <p>Or drag and drop files here</p>
+            </div>
+        </form>
+    </div>
+    <script src="scripts.js"></script>
+    
+
+</body>
+</html>
