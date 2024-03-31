@@ -1,73 +1,65 @@
-document.getElementById('file-label').addEventListener('click', function () {
-    document.getElementById('file').click();
-});
+document.addEventListener('DOMContentLoaded', () => {
+    // Обработчик события клика на кнопку "Выбрать файл"
+    document.getElementById('select-files-button').addEventListener('click', function () {
+        // Имитируем клик по скрытому input[type="file"]
+        document.getElementById('files').click();
+    });
 
-document.getElementById('file').addEventListener('change', handleFiles);
+    // Обработчик события изменения содержимого input[type="file"]
+    document.getElementById('files').addEventListener('change', function (event) {
+        // Вызываем функцию handleFiles при изменении содержимого input[type="file"]
+        handleFiles(event.target.files);
+        // Показываем кнопку "Upload" после выбора файлов
+        document.getElementById('upload-button').style.display = 'block';
+    });
 
-document.addEventListener('paste', async (event) => {
-    try {
-        const clipboardItems = event.clipboardData.items;
-        for (const clipboardItem of clipboardItems) {
-            if (clipboardItem.kind === 'file') {
-                const blob = clipboardItem.getAsFile();
-                handleFiles(blob);
-            }
-        }
-    } catch (e) {
-        console.error('Ошибка вставки файла из буфера обмена', e);
+    // Функция для обработки выбранных файлов
+    function handleFiles(inputFiles) {
+        const filesArray = Array.from(inputFiles);
+
+        const fileList = document.getElementById('file-list');
+        fileList.innerHTML = ''; // Очищаем список перед добавлением новых файлов
+        filesArray.forEach(file => {
+            const listItem = document.createElement('li');
+            listItem.textContent = file.name;
+            fileList.appendChild(listItem);
+
+            // Отправляем каждый файл на сервер
+            uploadFile(file);
+        });
+
+        // Показываем список выбранных файлов
+        fileList.style.display = 'block';
     }
+
+    // Функция для отправки файла на сервер
+    function uploadFile(file) {
+        const formData = new FormData(); // Создаем новый объект FormData
+        formData.append('file', file); // Добавляем выбранный файл в объект FormData
+
+        // Отправляем данные на сервер
+        fetch('/upload', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Ошибка загрузки файла на сервер');
+            }
+        })
+        .catch(error => {
+            console.error('Ошибка загрузки файла:', error);
+            alert('Произошла ошибка при загрузке файла на сервер.');
+        });
+    }
+
+    // Отправка данных формы на сервер при нажатии кнопки "Upload"
+    document.getElementById('upload-button').addEventListener('click', function (event) {
+        event.preventDefault();
+        // Очищаем список выбранных файлов и скрываем кнопку "Upload"
+        document.getElementById('file-list').innerHTML = '';
+        document.getElementById('file-list').style.display = 'none';
+        document.getElementById('upload-button').style.display = 'none';
+        alert('Файлы успешно загружены на сервер.');
+    });
 });
-
-
-let dropArea = document.getElementById('drop-area');
-
-['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-    dropArea.addEventListener(eventName, preventDefaults, false);
-    document.body.addEventListener(eventName, preventDefaults, false);
-});
-
-function preventDefaults (e) {
-    e.preventDefault();
-    e.stopPropagation();
-}
-
-['dragenter', 'dragover'].forEach(eventName => {
-    dropArea.addEventListener(eventName, () => highlight(dropArea), false);
-});
-
-['dragleave', 'drop'].forEach(eventName => {
-    dropArea.addEventListener(eventName, () => unhighlight(dropArea), false);
-});
-
-function highlight(elem) {
-    elem.classList.add('highlight');
-}
-
-function unhighlight(elem) {
-    elem.classList.remove('highlight');
-}
-
-dropArea.addEventListener('drop', handleDrop, false);
-
-function handleDrop(e) {
-    let dt = e.dataTransfer;
-    let files = dt.files;
-    handleFiles(files[0]);
-}
-
-function handleFiles(inputFiles) {
-    // Определяем файл для обработки
-    // Если функция вызывается с FileList (например, из input[type="file"]), берем первый файл
-    const file = inputFiles instanceof FileList ? inputFiles[0] : inputFiles;
-
-    // Показываем имя файла в интерфейсе
-    document.getElementById('filename').textContent = file.name;
-
-    // Показываем кнопку "Upload"
-    document.getElementById('submit-button').style.display = 'block';
-
-    // Здесь можно добавить дополнительную логику обработки файла
-    // Например, создание FormData и отправка файла на сервер через AJAX
-}
-
-
