@@ -2,8 +2,9 @@ body {
     font-family: Arial, sans-serif;
     background-color: #383737;
     margin: 0;
-    padding: 0;
+    padding-top: 50px; /* Отступ сверху, чтобы контент не перекрывался навигацией */
 }
+
 
 .container {
     max-width: 600px;
@@ -47,47 +48,96 @@ form {
     border: 2px dashed #ccc;
     padding: 20px;
     text-align: center;
-    margin-top: 20px;
+    margin: 20px auto; /* Центрируем элемент по горизонтали */
+    width: 50%; /* Задаем ширину элемента */
+    max-width: 600px; /* Максимальная ширина, чтобы на больших экранах элемент не был слишком широким */
 }
+
 
 .highlight {
     border-color: #007bff;
 }
+
+/* Сброс стилей */
+ul {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+}
+
 nav {
-    background-color: #f3f3f3;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+    background-color: #333; /* Тёмный фон для навигационной панели */
+    position: fixed; /* Фиксируем панель на верху страницы */
+    width: 100%; /* Панель занимает всю ширину */
+    top: 0; /* Расположение в верхней части экрана */
+    z-index: 1000; /* Панель всегда поверх других элементов */
 }
 
 nav ul {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
     display: flex;
+    justify-content: center; /* Центрируем ссылки по горизонтали */
+    align-items: center; /* Центрируем ссылки по вертикали */
 }
 
 nav ul li {
-    border-right: 1px solid #ccc;
-}
-
-nav ul li:last-child {
-    border-right: none;
+    padding: 10px; /* Добавляем немного пространства вокруг текста */
 }
 
 nav ul li a {
-    display: block;
-    padding: 10px 20px;
-    text-decoration: none;
-    color: #333;
-    background-color: #f3f3f3;
-    transition: background-color 0.3s;
+    text-decoration: none; /* Убираем подчёркивание текста ссылок */
+    color: white; /* Белый цвет текста */
+    padding: 10px 20px; /* Паддинг для ссылок */
 }
 
 nav ul li a:hover {
-    background-color: #e7e7e7;
+    background-color: #555; /* Цвет фона при наведении */
 }
 
-nav ul li a.active {
-    background-color: #007bff;
-    color: white;
+#links-container {
+    max-width: 100%;
+    overflow-x: auto; /* Гарантирует, что таблица будет прокручиваться, если это необходимо */
+    margin: 20px auto;
 }
+
+#links-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#links-table th, #links-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+    word-break: break-all; /* Разрешает перенос слов в любом месте, что предотвращает выход текста за границы ячейки */
+}
+
+#links-table th {
+    background-color: #f2f2f2;
+}
+
+#links-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+#links-table tr:hover {
+    background-color: #f1f1f1;
+}
+
+#links-table td button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+}
+
+#links-table td button:hover {
+    background-color: #45a049;
+}
+
+

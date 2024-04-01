@@ -132,4 +132,30 @@ app.post('/upload-link', async (req, res) => {
   }
 });
 
+app.get('/get-links', async (req, res) => {
+  try {
+      const pool = await sql.connect(sqlConfig);
+      const result = await pool.request()
+          .query('SELECT TOP (1000) [ID], [Ссылка] FROM [gena].[dbo].[Ссылки]');
+      res.json(result.recordset);
+  } catch (err) {
+      console.error('Ошибка при извлечении данных:', err);
+      res.status(500).send('Ошибка при получении данных');
+  }
+});
+app.use(express.static('.'));
+
+app.get('/files-list', (req, res) => {
+    const directoryPath = 'D:\\files';
+
+    fs.readdir(directoryPath, (err, files) => {
+        if (err) {
+            console.log('Ошибка при чтении директории:', err);
+            res.status(500).send('Ошибка при чтении директории');
+            return;
+        }
+        res.json(files);
+    });
+});
+
 
