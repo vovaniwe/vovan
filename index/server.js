@@ -3,7 +3,7 @@ const express = require('express'); // Фреймворк Express.js для со
 const multer = require('multer'); // Модуль multer для обработки многочисленных файлов, загружаемых через HTTP POST
 const path = require('path'); // Встроенный модуль Node.js для работы с путями к файлам и директориям
 const fs = require('fs'); // Встроенный модуль Node.js для работы с файловой системой
-
+const sql = require('mssql');
 // Создаем экземпляр приложения Express
 const app = express();
 const port = 8080; // Порт, на котором будет работать сервер
@@ -81,6 +81,30 @@ app.get('/files', (req, res) => {
 app.post('/upload', uploadTemp.single('file'), (req, res) => {
   // Файлы уже сохранены в папке назначения
   res.json({ message: 'Файл успешно загружен' });
+});
+app.use(express.json());
+
+const sqlConfig = {
+    
+    database: 'gena',
+    server: 'localhost',
+    options: {
+        encrypt: true,
+        trustServerCertificate: true // для разработки, в продакшне лучше использовать настоящие сертификаты
+    }
+};
+
+app.post('/upload-link', async (req, res) => {
+  console.log(req.body); // Проверка полученных данных
+  try {
+      await sql.connect(sqlConfig);
+      const result = await sql.query`INSERT INTO dbo.Ссылки (Ссылка) VALUES (${req.body.link})`;
+      console.log(result); // Проверка результата запроса
+      res.json({ success: true, message: 'Ссылка успешно добавлена' });
+  } catch (err) {
+      console.error(err);
+      res.json({ success: false, message: 'Ошибка при добавлении ссылки' });
+  }
 });
 
 // Запускаем сервер на указанном порту
