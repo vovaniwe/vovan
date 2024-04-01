@@ -4,9 +4,43 @@ const multer = require('multer'); // Модуль multer для обработк
 const path = require('path'); // Встроенный модуль Node.js для работы с путями к файлам и директориям
 const fs = require('fs'); // Встроенный модуль Node.js для работы с файловой системой
 const sql = require('mssql');
+
 // Создаем экземпляр приложения Express
 const app = express();
 const port = 8080; // Порт, на котором будет работать сервер
+app.use(express.json());
+// Добавьте middleware для обработки CORS
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+  res.header("Access-Control-Allow-Headers", "Content-Type");
+  next();
+});
+const sqlConfig = {
+    user:'VEYVAN',
+    database: 'gena',
+    password:'123456',
+    server: 'Veyvan',
+    options: {
+        encrypt: true,
+        trustServerCertificate: true // для разработки, в продакшне лучше использовать настоящие сертификаты
+    }
+};
+// Создание экземпляра pool
+const pool = new sql.ConnectionPool(sqlConfig);
+const poolConnect = pool.connect();
+
+poolConnect
+  .then(() => {
+    console.log("Подключение к базе данных успешно");
+  })
+  .catch((err) => {
+    console.error("Ошибка подключения к базе данных:", err);
+  });
+
+app.listen(port, () => {
+  console.log(`Server is running at http://localhost:${port}`);
+});
 
 // Пути к папкам для временных и постоянных загруженных файлов
 const TEMP_UPLOAD_FOLDER = 'temp'; // Папка для временных загруженных файлов
@@ -82,32 +116,20 @@ app.post('/upload', uploadTemp.single('file'), (req, res) => {
   // Файлы уже сохранены в папке назначения
   res.json({ message: 'Файл успешно загружен' });
 });
-app.use(express.json());
-
-const sqlConfig = {
-    
-    database: 'gena',
-    server: 'localhost',
-    options: {
-        encrypt: true,
-        trustServerCertificate: true // для разработки, в продакшне лучше использовать настоящие сертификаты
-    }
-};
-
 app.post('/upload-link', async (req, res) => {
-  console.log(req.body); // Проверка полученных данных
   try {
-      await sql.connect(sqlConfig);
-      const result = await sql.query`INSERT INTO dbo.Ссылки (Ссылка) VALUES (${req.body.link})`;
-      console.log(result); // Проверка результата запроса
-      res.json({ success: true, message: 'Ссылка успешно добавлена' });
+    let link = req.body.link; // Получаем значение ссылки из тела запроса
+    console.log(link); // Проверка полученных данных
+    await pool.connect();
+    const result = await pool.request()
+      .input('link', sql.NVarChar, link) // Указываем параметр для запроса
+      .query('INSERT INTO dbo.Ссылки (Ссылка) VALUES (@link)');
+    console.log(result); // Проверка результата запроса
+    res.json({ success: true, message: 'Ссылка успешно добавлена' });
   } catch (err) {
-      console.error(err);
-      res.json({ success: false, message: 'Ошибка при добавлении ссылки' });
+    console.error(err);
+    res.json({ success: false, message: 'Ошибка при добавлении ссылки' });
   }
 });
 
-// Запускаем сервер на указанном порту
-app.listen(port, () => {
-  console.log(`Server is running at http://localhost:${port}`);
-});
+
