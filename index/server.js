@@ -4,6 +4,7 @@ const multer = require('multer'); // Модуль multer для обработк
 const path = require('path'); // Встроенный модуль Node.js для работы с путями к файлам и директориям
 const fs = require('fs'); // Встроенный модуль Node.js для работы с файловой системой
 const sql = require('mssql');
+const AdmZip = require('adm-zip'); // Добавьте этот модуль в начало файла
 
 // Создаем экземпляр приложения Express
 const app = express();
@@ -111,10 +112,19 @@ app.get('/files', (req, res) => {
   });
 });
 
-// Обработчик POST запроса для загрузки временного файла
-app.post('/upload', uploadTemp.single('file'), (req, res) => {
-  // Файлы уже сохранены в папке назначения
-  res.json({ message: 'Файл успешно загружен' });
+app.post('/upload', upload.single('file'), (req, res) => {
+  const uploadedFile = `${UPLOAD_FOLDER}/${req.file.originalname}`;
+
+  // Проверяем, является ли файл ZIP-архивом
+  if (req.file.mimetype === 'application/zip') {
+      // Обработка ZIP-файла
+      const zip = new AdmZip(uploadedFile);
+      zip.extractAllTo(`${UPLOAD_FOLDER}/extracted/`, true);
+      res.json({ message: 'ZIP-файл успешно загружен и извлечен' });
+  } else {
+      // Если загруженный файл не ZIP-архив, возвращаем ошибку
+      res.status(400).json({ message: 'Только ZIP-файлы поддерживаются для загрузки' });
+  }
 });
 app.post('/upload-link', async (req, res) => {
   try {

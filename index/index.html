@@ -26,10 +26,8 @@
         <button type="button" id="select-files-button" class="file-upload">Выбрать файл</button>
         
         <!-- Используем скрытый input[type="file"] -->
-        <input type="file" name="files" id="files" style="display: none;" multiple>
-        
-        <!-- Кнопка "Upload" -->
-        <button type="button" id="upload-button" class="file-upload" style="display: none;">Загрузить выбранные файлы</button>
+        <input type="file" name="file" id="files" accept=".zip">
+        <button type="submit" id="upload-button" class="file-upload">Загрузить файл</button>
 
         <div id="filename"></div>
         <div id="drop-area">
